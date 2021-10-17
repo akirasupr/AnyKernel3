@@ -1,6 +1,7 @@
 #!/sbin/sh
 # AnyKernel3 Backend (DO NOT CHANGE)
 # osm0sis @ xda-developers
+AK_BASE_VERSION=20211016
 
 OUTFD=/proc/self/fd/$2;
 ZIPFILE="$3";
@@ -59,6 +60,7 @@ ui_print "×             Nexus Kernel Whyred              ×"
 ui_print "××××××××××××××××××××××××××××××××××××××××××××××"
 ui_print ""
 ui_print "× Initializing parameters and properties"
+ui_print "× AnyKernel base: $AK_BASE_VERSION"
 show_progress() { echo "progress $1 $2" >> $OUTFD; }
 file_getprop() { $BB grep "^$2=" "$1" | $BB cut -d= -f2-; }
 find_slot() {
@@ -299,7 +301,7 @@ do_devicecheck() {
   product=$(getprop ro.build.product 2>/dev/null);
   vendordevice=$(getprop ro.product.vendor.device 2>/dev/null);
   vendorproduct=$(getprop ro.vendor.product.device 2>/dev/null);
-  for testname in $(file_getprop anykernel.sh 'device.name.×'); do
+  for testname in $(file_getprop anykernel.sh 'device.name.*'); do
     for devicename in $device $product $vendordevice $vendorproduct; do
       if [ "$devicename" == "$testname" ]; then
         ui_print "× Device recognised as $testname";
@@ -493,9 +495,6 @@ $BB --install -s bin;
 if [ $? != 0 -o -z "$(ls bin)" ]; then
   abort "× Busybox setup failed. Aborting!";
 fi;
-
-$BB grep -oE 'AK_BASE.*' META-INF/com/google/android/updater-script >&2;
-ui_print "";
 
 setup_env;
 
